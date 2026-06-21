@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "airflow" / "dags"))
-from helpers import notifications
+from helpers import notifications  # noqa: E402
 
 
 class DummySES:
@@ -11,7 +11,11 @@ class DummySES:
         self.sent = None
 
     def send_raw_email(self, Source, Destinations, RawMessage):
-        self.sent = {"Source": Source, "Destinations": Destinations, "RawMessage": RawMessage}
+        self.sent = {
+            "Source": Source,
+            "Destinations": Destinations,
+            "RawMessage": RawMessage,
+        }
 
 
 def test_send_report_email_calls_boto3(monkeypatch, tmp_path):

@@ -1,4 +1,5 @@
 """Report file handling."""
+
 from pathlib import Path
 
 import polars as pl

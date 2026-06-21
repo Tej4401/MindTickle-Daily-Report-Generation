@@ -1,9 +1,10 @@
 """Database operations for querying lesson completion data."""
+
 import mysql.connector
 import polars as pl
 import psycopg2
 
-REPORT_SCHEMA = {
+REPORT_SCHEMA: dict[str, list] = {
     "Name": [],
     "Number of lessons completed": [],
     "Date": [],
@@ -28,13 +29,11 @@ def fetch_active_users(postgres_config: dict) -> pl.DataFrame:
     """
     with psycopg2.connect(**postgres_config) as pg_conn:
         with pg_conn.cursor() as cursor:
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT user_id, user_name
                 FROM mindtickle_users
                 WHERE LOWER(active_status) = 'active'
-                """
-            )
+                """)
             active_users_rows = cursor.fetchall()
 
     if not active_users_rows:
@@ -110,8 +109,7 @@ def aggregate_completions_by_user_and_date(
     ["Name", "Number of lessons completed", "Date"].
     """
     return (
-        lessons_df
-        .join(user_df, on="user_id", how="inner")
+        lessons_df.join(user_df, on="user_id", how="inner")
         .group_by(["user_name", "completion_date"])
         .agg(pl.len().alias("Number of lessons completed"))
         .sort(["completion_date", "user_name"])

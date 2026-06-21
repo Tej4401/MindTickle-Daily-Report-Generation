@@ -1,15 +1,15 @@
 """Configuration helpers for Airflow Variables / Connections with env fallbacks."""
+
 from __future__ import annotations
 
-import json
 import os
 from typing import Any, Optional, Tuple
 
 
-def _try_airflow_imports() -> Tuple[Optional[object], Optional[object]]:
+def _try_airflow_imports() -> Tuple[Optional[Any], Optional[Any]]:
     try:
-        from airflow.models import Variable  # type: ignore
         from airflow.hooks.base import BaseHook  # type: ignore
+        from airflow.models import Variable  # type: ignore
 
         return Variable, BaseHook
     except Exception:
@@ -77,4 +77,3 @@ def build_db_connections() -> tuple[dict, dict]:
         "database": os.environ.get("MYSQL_DATABASE"),
     }
     return postgres_config, mysql_config
-

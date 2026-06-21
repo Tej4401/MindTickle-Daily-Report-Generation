@@ -1,12 +1,13 @@
 """S3 storage operations."""
-from pathlib import Path
+
 import os
-from datetime import datetime, timezone as _tz
-import re
+from datetime import datetime
+from datetime import timezone as _tz
+from pathlib import Path
 
 import boto3
 
-from .config import get_var, get_connection
+from .config import get_connection, get_var
 
 
 def upload_file_to_s3(report_path: Path) -> str:
@@ -49,7 +50,9 @@ def upload_file_to_s3(report_path: Path) -> str:
         access_key = getattr(aws_conn, "login", None)
         secret_key = getattr(aws_conn, "password", None)
         if access_key and secret_key:
-            boto3_kwargs.update({"aws_access_key_id": access_key, "aws_secret_access_key": secret_key})
+            boto3_kwargs.update(
+                {"aws_access_key_id": access_key, "aws_secret_access_key": secret_key}
+            )
 
     s3 = boto3.client("s3", **boto3_kwargs)
     s3.upload_file(str(report_path), bucket, s3_key)

@@ -1,22 +1,21 @@
 from __future__ import annotations
 
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
-from airflow import DAG
 from airflow.decorators import task
 from airflow.models.param import Param
 from airflow.operators.python import get_current_context
 from airflow.utils.dates import days_ago
-
 from helpers import (
-    get_env,
-    build_db_connections,
     assemble_report_frame,
-    write_csv,
-    upload_file_to_s3,
+    build_db_connections,
     send_report_email,
+    upload_file_to_s3,
+    write_csv,
 )
+
+from airflow import DAG  # type: ignore[attr-defined]
 
 DEFAULT_ARGS = {
     "owner": "assignment",
@@ -62,9 +61,7 @@ def build_report() -> str:
     output_dir = Path("/opt/airflow/reports")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    report_path = output_dir / (
-        f"lesson_completion_report_{start_date}_{end_date}.csv"
-    )
+    report_path = output_dir / (f"lesson_completion_report_{start_date}_{end_date}.csv")
     write_csv(report_frame, report_path)
 
     return str(report_path)
