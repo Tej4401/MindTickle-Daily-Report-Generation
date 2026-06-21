@@ -36,6 +36,14 @@ def _build_boto3_kwargs(aws_region: str | None, aws_conn: object | None) -> dict
     return boto3_kwargs
 
 
+def _validate_email_address(addr: str) -> bool:
+    """Basic validation: must contain '@' and a domain part after it."""
+    if not addr or "@" not in addr:
+        return False
+    local, _, domain = addr.rpartition("@")
+    return bool(local and domain and "." in domain)
+
+
 def send_report_email(report_path: Path) -> None:
     """Send report file as email attachment via AWS SES."""
     aws_region = get_var(
@@ -63,6 +71,9 @@ def send_report_email(report_path: Path) -> None:
         )
 
     sender = senders_list[0]
+    # basic validation for sender
+    if not _validate_email_address(sender):
+        raise ValueError(f"Invalid sender email address: '{sender}'")
 
     recipients_val = None
     try:
@@ -82,6 +93,13 @@ def send_report_email(report_path: Path) -> None:
                 )
             )
         recipients = [r.strip() for r in recipients_env.split(",") if r.strip()]
+
+    # validate recipients and normalize
+    invalid = [r for r in recipients if not _validate_email_address(r)]
+    if invalid:
+        raise ValueError(
+            "Invalid recipient email address(es): %s" % ", ".join(invalid)
+        )
 
     subject = os.environ.get("SES_SUBJECT", "Lesson Completion Report")
 
