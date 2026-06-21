@@ -15,6 +15,7 @@ This project automates the process of generating lesson completion reports for M
 - **Error Resilience**: Built-in retry logic and comprehensive error handling
 - **Production-Ready**: Containerized with Docker for consistent deployment
 - **Modular Design**: Clean separation of concerns across helper modules
+ - **Linters & CI**: Pre-configured linters (`black`, `isort`, `ruff`, `flake8`, `mypy`) and a GitHub Actions workflow to enforce code quality on push and PRs
 
 ## 🏗️ Architecture
 
