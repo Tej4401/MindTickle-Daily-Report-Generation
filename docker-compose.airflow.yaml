@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  mt-postgres:
+    build:
+      context: ./setup
+      dockerfile: Dockerfile-PG
+    image: mindtickle-postgres:latest
+    env_file:
+      - setup/.env
+    ports:
+      - "5432:5432"
+    networks:
+      - my_network
+
+  mt-mysql:
+    build:
+      context: ./setup
+      dockerfile: Dockerfile-MySQL
+    image: mindtickle-mysql:latest
+    env_file:
+      - setup/.env
+    ports:
+      - "3306:3306"
+    networks:
+      - my_network
+
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile-airflow
+    image: assignment-airflow:latest
+    # user: "${AIRFLOW_UID:-1000}:${AIRFLOW_GID:-1000}"
+    env_file:
+      - .env
+    depends_on:
+      - mt-postgres
+      - mt-mysql
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/plugins:/opt/airflow/plugins
+      - airflow_logs:/opt/airflow/logs
+      - airflow_reports:/opt/airflow/reports
+    command: >
+      bash -c '
+        airflow db migrate &&
+        airflow users create \
+          --username "${AIRFLOW_ADMIN_USER:-admin}" \
+          --firstname "${AIRFLOW_ADMIN_FIRSTNAME:-Admin}" \
+          --lastname "${AIRFLOW_ADMIN_LASTNAME:-User}" \
+          --role Admin \
+          --email "${AIRFLOW_ADMIN_EMAIL:-admin@example.com}" \
+          --password "${AIRFLOW_ADMIN_PASSWORD:-admin}" || true;
+          airflow variables set bucket "${S3_REPORT_BUCKET}" &&
+      airflow variables set prefix "${S3_REPORT_PREFIX}" &&
+      airflow variables set senders "${SES_SENDER}" &&
+      airflow variables set recipients "${SES_RECIPIENTS}" &&
+
+      airflow connections delete aws_default || true &&
+      airflow connections add aws_default \
+        --conn-type aws \
+        --conn-login "${AWS_ACCESS_KEY_ID}" \
+        --conn-password "${AWS_SECRET_ACCESS_KEY}" \
+        --conn-extra "{\"region_name\":\"${AWS_REGION}\"}" &&
+
+        exec airflow standalone
+      '
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
+
+volumes:
+  airflow_logs:
+  airflow_reports:

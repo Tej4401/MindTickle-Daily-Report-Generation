@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  mt-postgres:
+    build:
+      dockerfile: Dockerfile-PG
+    image: postgres:latest
+    env_file: .env
+    ports:
+      - "5432:5432"
+    networks:
+      - my_network
+  mt-mysql:
+    build:
+      dockerfile: Dockerfile-MySQL
+    image: mysql:latest
+    env_file: .env
+    ports:
+      - "3306:3306"
+    networks:
+      - my_network
+
+networks:
+  my_network:

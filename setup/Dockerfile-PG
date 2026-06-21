@@ -1,0 +1,5 @@
+# Use the official PostgreSQL image from Docker Hub
+FROM postgres:latest
+
+# Copy the SQL script with table creation and data insertion
+COPY init.pg.sql /docker-entrypoint-initdb.d/init.sql

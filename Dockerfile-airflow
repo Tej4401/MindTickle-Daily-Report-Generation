@@ -1,0 +1,15 @@
+FROM apache/airflow:2.10.3
+
+COPY requirements.txt /tmp/requirements.txt
+
+USER airflow
+
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+USER root
+
+RUN mkdir -p /opt/airflow/reports && \
+    chown airflow:root /opt/airflow/reports && \
+    chmod 775 /opt/airflow/reports
+
+USER airflow

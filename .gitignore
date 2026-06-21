@@ -1,0 +1,27 @@
+venv/
+*.env
+
+# Keep example env file tracked even if other .env patterns match
+!.env.example
+
+# Ignore generated log files but keep the directory
+airflow/logs/*
+!airflow/logs/.gitkeep
+
+# Ignore generated reports but keep the directory
+airflow/reports/*
+!airflow/reports/.gitkeep
+
+
+# Ignore runtime env file (tracked by default, should be private)
+.env
+
+# Ignore Python bytecode and cache directories
+__pycache__/
+**/__pycache__/
+*.pyc
+**/*.pyc
+*.pyo
+**/*.pyo
+*.pyd
+**/*.pyd
