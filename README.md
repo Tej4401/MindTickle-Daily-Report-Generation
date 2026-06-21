@@ -117,21 +117,6 @@ This generates a report for the inclusive date range without automatic schedulin
 
 ### Setup & Launch
 
-startup script — recommended
-
-The repository provides a small startup script that automates common developer tasks: it copies `.env` files from the examples when missing, builds the Airflow image, starts the services with Docker Compose, and waits for the Airflow webserver to become healthy.
-
-Run the script from any location (it resolves the repo root automatically):
-
-```bash
-git clone <repository-url>
-cd <repository-folder-name>
-chmod +x scripts/startup.sh
-./scripts/startup.sh
-```
-
-Manual setup
-
 1. **Clone the repository and navigate into it:**
   ```bash
   git clone <repository-url>
@@ -152,6 +137,13 @@ Manual setup
   - Airflow admin credentials
 
 4. **Start all services:**
+
+  Startup Script(recommended):
+  ```bash
+  chmod +x scripts/startup.sh
+  ./scripts/startup.sh
+  ```
+  Manual:
   ```bash
   docker compose -f docker-compose.airflow.yaml up --build
   ```
